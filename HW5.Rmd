@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(rvest)
 library(purrr)
+library(viridis)
 set.seed(1)
 ```
 
@@ -65,22 +66,30 @@ total_cases =
   left_join(unsolved_cases, total_murders, by = "city_state")
 
 
-prop_unsolved = function(df) {
-  ci_unsolved = prop.test(df$unsolved_cases, df$total)
+p_unsolved = function(df) {
+  cl_unsolved = prop.test(df$unsolved_cases, df$total)
   
-  broom::tidy(ci_unsolved) %>% 
+  broom::tidy(cl_unsolved) %>% 
     select(estimate, conf.low, conf.high)
     }
 
 total_cases %>%
   filter(city_state == "Baltimore,MD") %>%
-  prop_unsolved %>%
+  p_unsolved %>%
   knitr::kable() 
 
 city_nest = nest(total_cases, unsolved_cases:total)
 
 unsolved_cl = city_nest %>% 
-  mutate(prop_unsolved = map(data, prop_unsolved)) %>% 
+  mutate(p_unsolved = map(data, p_unsolved)) %>% 
   unnest() %>%
   rename(lb = conf.low, ub = conf.high)
+
+unsolved_cl %>%
+ mutate(city_state = forcats::fct_reorder(city_state, estimate)) %>%
+ggplot(aes(x = city_state, y = estimate)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = lb, ymax = ub)) +
+  theme(axis.text.x = element_text(angle=90, hjust=1))
+    
 ```
