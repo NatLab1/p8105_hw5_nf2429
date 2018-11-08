@@ -10,10 +10,36 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(rvest)
+library(purrr)
 set.seed(1)
 ```
+
 ```{r}
-temp = list.files(pattern = "*.csv")
-myfiles = lapply(temp, read.delim)
-dplyr::bind_rows(myfiles)
+names = list.files("./data", full.names = TRUE)
+
+df = names %>%
+  map(read_csv)
+
+for (i in 1:20)
+  if (i <= 10) {
+    df[[i]] = df[[i]] %>% 
+      mutate(arm = "Control", study_id = i)
+  } else if (i > 10) {
+    df[[i]] = df[[i]] %>% 
+      mutate(arm = "Experimental", study_id = i - 10)
+  }
+
+df = bind_rows(df) %>%
+  gather(key = "week", week_1:week_8, value = "value") %>%
+  mutate(week = as.numeric(str_extract(week, "\\d"))) 
+data = df
+
+data %>%
+  mutate(study_id = as.character(study_id)) %>%
+  group_by(arm, study_id) %>%
+  ggplot(aes(x = week, y = value, color = arm, type = study_id)) +
+  geom_line() +
+  labs(y = "value", caption = "response per subject over time")
+
+
 ```
