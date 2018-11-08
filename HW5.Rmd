@@ -14,6 +14,7 @@ library(purrr)
 set.seed(1)
 ```
 
+#Problem 1
 ```{r}
 names = list.files("./data", full.names = TRUE)
 
@@ -40,6 +41,30 @@ data %>%
   ggplot(aes(x = week, y = value, color = arm, type = study_id)) +
   geom_line() +
   labs(y = "value", caption = "response per subject over time")
+```
 
+#Problem 2
+```{r}
+murder_data = read_csv("https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv")
 
+murder_data = murder_data %>%
+  unite("city_state", c("city", "state"), sep = ",", remove = TRUE)
+
+unsolved_cases =
+  murder_data %>%
+  filter(disposition %in% c("Open/No arrest", "Closed without arrest")) %>%
+  group_by(city_state) %>%
+  summarize(unsolved_cases = n())
+
+total_murders =
+  murder_data %>%
+  group_by(city_state) %>%
+  summarize(total_murders = n())
+
+total_cases = 
+  left_join(unsolved_cases, total_murders, by = "city_state")
+
+prop.test(x, n, p = NULL,
+          alternative = c("two.sided", "less", "greater"),
+          conf.level = 0.95, correct = TRUE)
 ```
