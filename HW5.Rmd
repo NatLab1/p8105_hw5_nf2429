@@ -1,0 +1,19 @@
+---
+title: "HW5"
+author: "Nathalie Fadel"
+date: "11/7/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(rvest)
+set.seed(1)
+```
+```{r}
+temp = list.files(pattern = "*.csv")
+myfiles = lapply(temp, read.delim)
+dplyr::bind_rows(myfiles)
+```
