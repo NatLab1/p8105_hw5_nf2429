@@ -90,6 +90,7 @@ unsolved_cl %>%
 ggplot(aes(x = city_state, y = estimate)) +
   geom_col() +
   geom_errorbar(aes(ymin = lb, ymax = ub)) +
-  theme(axis.text.x = element_text(angle=90, hjust=1))
+  theme(axis.text.x = element_text(angle=90, hjust=1)) +
+  labs(x = "Location", caption = "proportion of unsolved murders in US cities")
     
 ```
