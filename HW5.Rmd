@@ -59,12 +59,28 @@ unsolved_cases =
 total_murders =
   murder_data %>%
   group_by(city_state) %>%
-  summarize(total_murders = n())
+  summarize(total = n())
 
 total_cases = 
   left_join(unsolved_cases, total_murders, by = "city_state")
 
-prop.test(x, n, p = NULL,
-          alternative = c("two.sided", "less", "greater"),
-          conf.level = 0.95, correct = TRUE)
+
+prop_unsolved = function(df) {
+  ci_unsolved = prop.test(df$unsolved_cases, df$total)
+  
+  broom::tidy(ci_unsolved) %>% 
+    select(estimate, conf.low, conf.high)
+    }
+
+total_cases %>%
+  filter(city_state == "Baltimore,MD") %>%
+  prop_unsolved %>%
+  knitr::kable() 
+
+city_nest = nest(total_cases, unsolved_cases:total)
+
+unsolved_cl = city_nest %>% 
+  mutate(prop_unsolved = map(data, prop_unsolved)) %>% 
+  unnest() %>%
+  rename(lb = conf.low, ub = conf.high)
 ```
