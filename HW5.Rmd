@@ -2,7 +2,7 @@
 title: "HW5"
 author: "Nathalie Fadel"
 date: "11/7/2018"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -45,7 +45,7 @@ data %>%
 ```
 
 #Problem 2
-```{r}
+```{r, fig.width=10, dpi=300}
 murder_data = read_csv("https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv")
 
 murder_data = murder_data %>%
@@ -90,7 +90,11 @@ unsolved_cl %>%
 ggplot(aes(x = city_state, y = estimate)) +
   geom_col() +
   geom_errorbar(aes(ymin = lb, ymax = ub)) +
-  theme(axis.text.x = element_text(angle=90, hjust=1)) +
+  theme(axis.text.x = element_text(angle=45, hjust=1)) +
   labs(x = "Location", caption = "proportion of unsolved murders in US cities")
     
 ```
+
+From the graph we can see that Chicago, IL has the highest unsolved murder rate in the US, with approximately 90% of all murder cases unsolved. Richmond, VA has the lowest unsolved murder rate, at approximately 25%.
+
+*Author's note: I asked my girlfriend, who is from New Orleans, if she knew that her home city has the 2nd highest unsolved murder rate, and she was hardly surprised. She said "when my friend was murdered, the police didn't even investigate. They usually don't even bother."*
